@@ -1,15 +1,27 @@
-import Parser (readExpr, eval)
+import Parser
+import Control.Monad (liftM)
 
 main :: IO ()
 main = do
-    putStrLn $ show . readExpr $ "(1 2 2)"
-    putStrLn $ show . readExpr $ "'(1 3 (\"this\" \"one\"))"
-    putStrLn $ show . readExpr $ "a test"
-    putStrLn $ show . readExpr $ "(a test)"
-    putStrLn $ show . readExpr $ "(a (nested) test)"
-    putStrLn $ show . readExpr $ "(a '(quoted (dotted . list)) test)"
-    putStrLn $ show . readExpr $ "(a '(imbalanced parens)" -- must fail
-    putStrLn $ show . eval . readExpr $ "(+ 2 2)"
-    putStrLn $ show . eval . readExpr $ "(+ 2 (-4 1))"
-    putStrLn $ show . eval . readExpr $ "(+ 2 (- 4 1))"
-    putStrLn $ show . eval . readExpr $ "(- (+ 4 6 3) 3 5 2)"
+    putStrLn $ parse "(1 2 2)"
+    putStrLn $ parse "'(1 3 (\"this\" \"one\"))"
+    putStrLn $ parse "a test"
+    putStrLn $ parse "(a test)"
+    putStrLn $ parse "(a (nested) test)"
+    putStrLn $ parse "(a '(quoted (dotted . list)) test)"
+    putStrLn $ parse "(a '(imbalanced parens)" -- must fail
+    putStrLn $ parseAndEval "(+ 2 2)"
+    putStrLn $ parseAndEval "(+ 2 (-4 1))" -- todo: why this is failing?
+    putStrLn $ parseAndEval "(+ 2 (- 4 1))"
+    putStrLn $ parseAndEval "(- (+ 4 6 3) 3 5 2)"
+    putStrLn $ parseAndEval "(- (+ 4 6 3) 3 g 2)" -- must fail
+
+parse :: String -> String
+parse expr = do
+    evaled <- return $ liftM show $ readExpr expr
+    extractValue $ trapError evaled
+
+parseAndEval :: String -> String
+parseAndEval expr = do
+    evaled <- return $ liftM show $ readExpr expr >>= eval
+    extractValue $ trapError evaled
