@@ -15,6 +15,12 @@ main = do
     putStrLn $ parseAndEval "(+ 2 (- 4 1))"
     putStrLn $ parseAndEval "(- (+ 4 6 3) 3 5 2)"
     putStrLn $ parseAndEval "(- (+ 4 6 3) 3 g 2)" -- must fail
+    putStrLn $ parseAndEval "(< 2 3)"
+    putStrLn $ parseAndEval "(> 2 3)"
+    putStrLn $ parseAndEval "(>= 3 3)"
+    putStrLn $ parseAndEval "(string=? \"test\" \"test\")"
+    putStrLn $ parseAndEval "(string=? \"abc\" \"test\")"
+    putStrLn $ parseAndEval "(string<=? \"abc\" \"test\")"
 
 parse :: String -> String
 parse expr = do
