@@ -50,15 +50,15 @@ parseNumber :: Parser LispVal
 parseNumber = liftM ( Number . read ) $ many1 digit
 
 parseExpr :: Parser LispVal
-parseExpr = parseAtom 
-    <|> parseString
-    <|> parseNumber
-    <|> parseQuoted
-    <|> do 
+parseExpr = do 
         char '('
         x <- (try parseList) <|> parseDottedList
         char ')'
         return x
+    <|> parseAtom
+    <|> parseNumber
+    <|> parseQuoted
+    <|> parseString
 
 parseList :: Parser LispVal
 parseList = liftM List $ sepBy parseExpr spaces
@@ -93,6 +93,11 @@ eval val@(String _) = return val
 eval val@(Number _) = return val
 eval val@(Bool _) = return val
 eval (List [Atom "quote", val]) = return val
+eval (List [Atom "if", pred, conseq, alt]) = do
+    result <- eval pred
+    case result of
+        Bool False -> eval alt
+        otherwise -> eval conseq
 eval val@(Atom _) = return val
 eval (List (Atom func : args)) =  mapM eval args >>= apply func
 eval val@(DottedList _ _) = return val
@@ -189,5 +194,4 @@ extractValue :: ThrowsError a -> a
 extractValue (Right val) = val
 -- no pattern match for Left, because calling extractValue for Left would be a
 -- programming error
-
 

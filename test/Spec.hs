@@ -21,6 +21,7 @@ main = do
     putStrLn $ parseAndEval "(string=? \"test\" \"test\")"
     putStrLn $ parseAndEval "(string=? \"abc\" \"test\")"
     putStrLn $ parseAndEval "(string<=? \"abc\" \"test\")"
+    putStrLn $ parseAndEval "(if (< 2 3) \"yes\" \"no\")"
 
 parse :: String -> String
 parse expr = do
