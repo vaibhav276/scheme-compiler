@@ -21,6 +21,7 @@ library
                      , parsec
                      , mtl
   default-language:    Haskell2010
+  extensions:          ExistentialQuantification
 
 executable scheme-compiler-exe
   hs-source-dirs:      app

@@ -130,7 +130,9 @@ primitives = [
     ("car", car),
     ("cdr", cdr),
     ("cons", cons),
-    ("eqv", eqv)
+    ("eq?", eqv),
+    ("eqv?", eqv),
+    ("equal?", equal)
     ]
 
 numericBinOp :: (Integer -> Integer -> Integer) -> [LispVal] -> ThrowsError LispVal
@@ -233,3 +235,20 @@ extractValue (Right val) = val
 -- no pattern match for Left, because calling extractValue for Left would be a
 -- programming error
 
+data Unpacker = forall a . Eq a => AnyUnpacker ( LispVal -> ThrowsError a )
+
+unpackEquals :: LispVal -> LispVal -> Unpacker -> ThrowsError Bool
+unpackEquals arg1 arg2 (AnyUnpacker unpacker) = do
+    unpacked1 <- unpacker arg1
+    unpacked2 <- unpacker arg2
+    return $ unpacked1 == unpacked2
+    `catchError` ( const $ return False )
+
+equal :: [LispVal] -> ThrowsError LispVal
+equal [arg1, arg2] = do
+    primitiveEquals <- liftM or $ mapM (unpackEquals arg1 arg2) [AnyUnpacker unpackNum,
+                                                                AnyUnpacker unpackStr,
+                                                                AnyUnpacker unpackBool]
+    eqvEquals <- eqv [arg1, arg2]
+    return $ Bool $ (primitiveEquals || let (Bool x) = eqvEquals in x)
+equal badArgList = throwError $ NumArgs 2 badArgList

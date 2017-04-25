@@ -25,8 +25,10 @@ main = do
     putStrLn $ parseAndEval "(car '(2 3 4))"
     putStrLn $ parseAndEval "(cdr '(2 3 4))"
     putStrLn $ parseAndEval "(cons 5 '(2 3 4))"
-    putStrLn $ parseAndEval "(eqv '(5) '(2 3 4))"
-    putStrLn $ parseAndEval "(eqv '(2 3 4) '(2 3 4))"
+    putStrLn $ parseAndEval "(eqv? '(5) '(2 3 4))"
+    putStrLn $ parseAndEval "(eqv? '(2 3 4) '(2 3 4))"
+    putStrLn $ parseAndEval "(equal? \"2\" 2)"
+    putStrLn $ parseAndEval "(equal? \"2\" 3)"
 
 parse :: String -> String
 parse expr = do
