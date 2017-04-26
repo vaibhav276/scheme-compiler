@@ -1,12 +1,15 @@
 module Main where
 
 import Lib
-import Parser
 import System.Environment
 import Control.Monad (liftM)
+
+import Repl (runRepl, evalAndPrint)
 
 main :: IO ()
 main = do
     args <- getArgs
-    evaled <- return $ liftM show $ readExpr (args !! 0) >>= eval
-    putStrLn $ extractValue $ trapError evaled
+    case length args of
+        0 -> runRepl
+        1 -> evalAndPrint $ args !! 0
+        otherwise -> putStrLn "Program takes only 0 or 1 argument"

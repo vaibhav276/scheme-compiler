@@ -1,8 +1,7 @@
+{-# LANGUAGE ExistentialQuantification #-}
 module Parser (
-        readExpr
-        , eval
-        , extractValue
-        , trapError
+        evalString
+        , evalStringImpl
     ) where
 
 import Text.ParserCombinators.Parsec hiding (spaces)
@@ -22,6 +21,12 @@ readExpr :: String -> ThrowsError LispVal
 readExpr input = case parse parseExpr "lisp" input of
     Left err -> throwError $ Parser err
     Right val -> return val
+
+evalStringImpl :: String -> String
+evalStringImpl expr = extractValue $ trapError (liftM show $ readExpr expr >>= eval)
+
+evalString :: String -> IO String
+evalString expr = return $ evalStringImpl expr
 
 symbol :: Parser Char
 symbol = oneOf "!$%&|*+-/:<=?>@^_~#"
